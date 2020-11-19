@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #List all pods in the current namespace
 kp() {
     kubectl get pods
