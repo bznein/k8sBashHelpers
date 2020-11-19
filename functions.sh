@@ -99,5 +99,5 @@ choose_all(){
 
 
 secret-read() {
-    kubectl get secret $1 -o json | jq -r '.data | with_entries(.value |= @base64d)';
+    kubectl get secret "$1" -o json | jq -r '.data | with_entries(.value |= @base64d)';
 }
