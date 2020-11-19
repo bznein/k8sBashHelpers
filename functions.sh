@@ -1,6 +1,6 @@
-
+#List all pods in the current namespace
 kp() {
-    k get pods
+    kubectl get pods
 }
 
 # Quickly executes bash in the pod.
@@ -11,24 +11,27 @@ ke() {
     echo " === Logging into $pod ==="
 
     echo '\033[0;32m'
-    k exec -it "$pod" -- bash
+    kubectl exec -it "$pod" -- bash
     echo '\033[0m'
 }
 
+#Get logs from pod in the current namespace
 kl() {
     pod=$(choose_pod "$1")
     if [ "$pod" = "" ]; then return; fi
 
-    k logs "$pod" -f
+    kubectl logs "$pod" -f
 }
 
+#Changes context
 kc() {
     context=$(choose_context "$1")
     if [ "$context" = "" ]; then return; fi
 
-    k config use-context "$context"
+    kubectl config use-context "$context"
 }
 
+#Read and decodes a secret
 ks() {
     secret=$(choose_secret "$1")
 
@@ -37,19 +40,23 @@ ks() {
     secret-read "${secret#*/}"
 }
 
+#Chooses a resource (only those that show up with kubectl get all)
+# and runs "describe" on it
 kd() {
     res=$(choose_all "$1")
     if [ "$res" = "" ]; then return; fi
 
-    k describe "$res"
+    kubectl describe "$res"
 }
 
-#Support other formats than yam;
+#Chooses a resource (only those that show up with kubectl get all)
+# and runs "get -o yaml" on it
+#TODO Support other formats than yaml
 ko() {
     res=$(choose_all "$1")
     if [ "$res" = "" ]; then return; fi
 
-    k get "$res" -o yaml
+    kubectl get "$res" -o yaml
 }
 
 choose_pod() {
@@ -57,7 +64,7 @@ choose_pod() {
         echo "$1"
         return
     else
-        k get pods --no-headers | fzf | awk '{ print $1 }'
+        kubectl get pods --no-headers | fzf | awk '{ print $1 }'
     fi
 }
 
@@ -66,7 +73,7 @@ choose_context() {
         echo "$1"
         return
     else
-        k config get-contexts --no-headers -o name | fzf | awk '{ print $1 }'
+        kubectl config get-contexts --no-headers -o name | fzf | awk '{ print $1 }'
     fi
 }
 
@@ -75,7 +82,7 @@ choose_secret() {
         echo "$1"
         return
     else
-        k get secrets -o name | fzf | awk '{ print $1 }'
+        kubectl get secrets -o name | fzf | awk '{ print $1 }'
     fi
 }
 
@@ -84,7 +91,7 @@ choose_all(){
         echo "$1"
         return
     else
-        k get all --no-headers -o name | fzf | awk '{ print $1 }'
+        kubectl get all --no-headers -o name | fzf | awk '{ print $1 }'
     fi
 }
 
