@@ -52,6 +52,21 @@ kd() {
 }
 
 #Chooses a resource (only those that show up with kubectl get all)
+# and runs "delete" on it, asking for confirmation
+kdd() {
+    res=$(choose_all "$1")
+    if [ "$res" = "" ]; then return; fi
+
+    read -p "Are you sure you want to delete $res?" -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        kubectl delete "$res"
+    fi
+}
+
+
+#Chooses a resource (only those that show up with kubectl get all)
 # and runs "get -o yaml" on it
 #TODO Support other formats than yaml
 ko() {
