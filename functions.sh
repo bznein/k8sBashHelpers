@@ -17,6 +17,17 @@ ke() {
     echo '\033[0m'
 }
 
+# Edits a custom resource
+kee() {
+    resource_definition=$(choose_custom_resource "$1")
+
+    if [ "$resource_definition" = "" ]; then return; fi
+
+    resource=$(choose_resource "$resource_definition")
+
+    kubectl edit $resource
+}
+
 #Get logs from pod in the current namespace
 kl() {
     pod=$(choose_pod "$1")
@@ -58,8 +69,8 @@ kdd() {
     if [ "$res" = "" ]; then return; fi
 
     ans="n"
-    read "ans?Are you sure you want to delete $res? [y/N] "
-    if [[ $ans =~ ^[Yy]$ ]]
+    read -r  "ans?Are you sure you want to delete $res? [y/N] "
+    if [[ "$ans" =~ ^[Yy]$ ]]
     then
         kubectl delete "$res"
     fi
@@ -115,4 +126,20 @@ choose_all(){
 
 secret-read() {
     kubectl get secret "$1" -o json | jq -r '.data | with_entries(.value |= @base64d)';
+}
+
+
+choose_custom_resource() {
+    if [ -n "$1" ]; then
+        echo "$1"
+        return
+    else
+        resources=(); for crd in `kubectl get crds -o name`; do resources+=${crd##*/}; resources+='\n'; done
+        echo $resources | fzf | awk '{ print $1 }'
+    fi
+}
+
+choose_resource() {
+    kubectl get "$1" -o name | fzf | awk '{ print $1 }'
+
 }
