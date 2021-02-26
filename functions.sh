@@ -25,7 +25,7 @@ kee() {
 
     resource=$(choose_resource "$resource_definition")
 
-    kubectl edit $resource
+    kubectl edit "$resource"
 }
 
 #Get logs from pod in the current namespace
@@ -134,8 +134,8 @@ choose_custom_resource() {
         echo "$1"
         return
     else
-        resources=(); for crd in `kubectl get crds -o name`; do resources+=${crd##*/}; resources+='\n'; done
-        echo $resources | fzf | awk '{ print $1 }'
+        resources=(); for crd in $(kubectl get crds -o name); do resources+=("${crd##*/}"); resources+=('\n'); done
+        echo "${resources[@]}" | fzf | awk '{ print $1 }'
     fi
 }
 
