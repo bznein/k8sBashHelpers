@@ -141,5 +141,9 @@ choose_custom_resource() {
 
 choose_resource() {
     kubectl get "$1" -o name | fzf | awk '{ print $1 }'
+}
 
+
+choose_api_resource() {
+    kubectl api-resources --verbs=list -o name | fzf | awk '{ print $1 }'
 }
