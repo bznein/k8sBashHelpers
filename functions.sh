@@ -87,6 +87,16 @@ ko() {
     kubectl get "$res" -o yaml
 }
 
+
+# Deletes a resource (if shown by kubectl all)
+# and deletes it with --grace-period=0 --force
+kdf() {
+    res=$(choose_all "$1")
+    if [ "$res" = "" ]; then return; fi
+
+    kubectl delete "$res" --grace-period=0 --force
+}
+
 choose_pod() {
     if [ -n "$1" ]; then
         echo "$1"
