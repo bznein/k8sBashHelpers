@@ -86,6 +86,13 @@ ko() {
 
     kubectl get "$res" -o yaml
 }
+kj() {
+    res=$(choose_all "$1")
+    if [ "$res" = "" ]; then return; fi
+
+    kubectl get "$res" -o json
+}
+
 
 
 # Deletes a resource (if shown by kubectl all)
