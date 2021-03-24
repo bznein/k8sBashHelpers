@@ -53,6 +53,18 @@ ks() {
     secret-read "${secret#*/}"
 }
 
+#Reads all services with an external ip, and opens the link of the selected one.
+ksvc() {
+    svc=$(choose_svc "$1")
+
+    if [ "$svc" = "" ]; then return; fi
+
+    port=`echo $svc | awk '{print $5}' | cut -d':' -f 1`
+    url=`echo $svc | awk '{str = sprintf("http://%s", $4)} END {print str}'`
+    open $url:$port
+
+}
+
 #Chooses a resource (only those that show up with kubectl get all)
 # and runs "describe" on it
 kd() {
@@ -128,6 +140,16 @@ choose_secret() {
         return
     else
         kubectl get secrets -o name | fzf | awk '{ print $1 }'
+    fi
+}
+
+
+choose_svc() {
+    if [ -n "$1" ]; then
+        echo "$1"
+        return
+    else
+        k get svc --no-headers | grep "<none>" -v | fzf
     fi
 }
 
