@@ -12,8 +12,9 @@ ke() {
 
     echo " === Logging into $pod ==="
 
+    container=$(choose_container "$pod" )
     echo '\033[0;32m'
-    kubectl exec -it "$pod" -- bash
+    kubectl exec -it "$pod" -c "$container" -- bash
     echo '\033[0m'
 }
 
@@ -33,7 +34,8 @@ kl() {
     pod=$(choose_pod "$1")
     if [ "$pod" = "" ]; then return; fi
 
-    kubectl logs "$pod" -f
+    container=$(choose_container "$pod" )
+    kubectl logs "$pod" -c "$container" -f
 }
 
 #Changes context
@@ -59,9 +61,9 @@ ksvc() {
 
     if [ "$svc" = "" ]; then return; fi
 
-    port=`echo $svc | awk '{print $5}' | cut -d':' -f 1`
-    url=`echo $svc | awk '{str = sprintf("http://%s", $4)} END {print str}'`
-    open $url:$port
+    port=$(echo "$svc" | awk '{print $5}' | cut -d':' -f 1)
+    url=$(echo "$svc" | awk '{str = sprintf("http://%s", $4)} END {print str}')
+    open "$url":"$port"
 
 }
 
@@ -185,4 +187,16 @@ choose_resource() {
 
 choose_api_resource() {
     kubectl api-resources --verbs=list -o name | fzf | awk '{ print $1 }'
+}
+
+choose_container() {
+    pod="$1"
+    containers=$(/bin/bash -c "kubectl get po \"$pod\" -o jsonpath={.spec.containers[*].name}")
+    number_containers=$(awk -F" " '{print NF-1}' <<< "$containers")
+    if [ "$number_containers" = "0" ]; then
+        echo ""
+        return
+    else
+        echo "$containers" | tr " " "\n" | fzf | awk '{ print $1 }'
+    fi
 }
