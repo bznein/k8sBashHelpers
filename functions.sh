@@ -18,6 +18,14 @@ ke() {
     echo '\033[0m'
 }
 
+kac() {
+    secret=$(choose_ac "$1")
+
+    if [ "$secret" = "" ]; then return; fi
+
+    kubectl get secret  "${secret#*/}" -o jsonpath='{.data.cluster-config\.json}' | base64 -d | jq 'del(.mongoDbVersions)'
+}
+
 # Edits a custom resource
 kee() {
     resource_definition=$(choose_custom_resource "$1")
@@ -133,6 +141,15 @@ choose_context() {
         return
     else
         kubectl config get-contexts --no-headers -o name | fzf | awk '{ print $1 }'
+    fi
+}
+
+choose_ac() {
+     if [ -n "$1" ]; then
+        echo "$1"
+        return
+    else
+        kubectl get secrets -o name | grep "\-config" | fzf | awk '{ print $1 }'
     fi
 }
 
