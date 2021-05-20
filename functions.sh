@@ -119,11 +119,17 @@ kj() {
 
 # Deletes a resource (if shown by kubectl all)
 # and deletes it with --grace-period=0 --force
+# asking for confirmation
 kdf() {
     res=$(choose_all "$1")
     if [ "$res" = "" ]; then return; fi
-
-    kubectl delete "$res" --grace-period=0 --force
+    
+    ans="n"
+    read -r  "ans?Are you sure you want to delete $res? [y/N] "
+    if [[ "$ans" =~ ^[Yy]$ ]]
+    then
+        kubectl delete "$res" --grace-period=0 --force
+    fi
 }
 
 choose_pod() {
