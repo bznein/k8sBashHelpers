@@ -223,3 +223,20 @@ choose_container() {
         echo "$containers" | tr " " "\n" | fzf | awk '{ print $1 }'
     fi
 }
+
+
+kdump() {
+    choices=$(echo "Secrets\nPods\nConfigmaps\nStatefulSets\nDeployments\nOpsManager\nMongoDB\nMongoDBCommunity\nMongoDBUser" | fzf -m)
+    output=""
+    IFS=$'\n' read -rd '' split_choice <<<"$choices"
+    for choice in "${split_choice[@]}"
+    do
+        if [ "$choice" = "Secrets" ]
+        then
+            output+=$(kubectl get secrets -o name | xargs -n1 -I name kubectl get name -o json | jq -r '.data | with_entries(.value |= @base64d)')
+        else
+            output+=$(kubectl get "$choice"  -o yaml)
+        fi
+    done
+    echo "$output"
+}
