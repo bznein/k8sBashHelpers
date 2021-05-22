@@ -18,6 +18,8 @@ ke() {
     echo '\033[0m'
 }
 
+# Gets a secret containing an automation config and returns it formatted by jq
+# it removes the mongoDbVersions field to make it shorter
 kac() {
     secret=$(choose_ac "$1")
 
