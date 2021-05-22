@@ -226,7 +226,7 @@ choose_container() {
 
 
 kdump() {
-    choices=$(echo "Secrets\nPods\nConfigmaps\nStatefulSets\nDeployments\nOpsManager\nMongoDB\nMongoDBCommunity\nMongoDBUser" | fzf -m)
+    choices=$(printf "Secrets\nPods\nConfigmaps\nStatefulSets\nDeployments\nOpsManager\nMongoDB\nMongoDBCommunity\nMongoDBUser" | fzf -m)
     output=""
     IFS=$'\n' read -rd '' split_choice <<<"$choices"
     for choice in "${split_choice[@]}"
