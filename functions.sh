@@ -14,8 +14,8 @@ ke() {
 
     container=$(choose_container "$pod" )
     echo '\033[0;32m'
-    kubectl exec -it "$pod" -c "$container" -- bash
-    if [ $? -ne 0 ]; then
+
+    if ! kubectl exec -it "$pod" -c "$container" -- bash; then
         kubectl exec -it "$pod" -c "$container" -- sh
     fi
     echo '\033[0m'
