@@ -192,6 +192,22 @@ choose_all(){
     fi
 }
 
+# Changes the default Namespace.
+# If $1 is not provided, show a list of Namespaces instead.
+kns() {
+    local namespace
+    if [ -z "$1" ]; then
+        namespace=$(choose-ns)
+    else
+        namespace=$1
+    fi
+
+    kubectl config set-context --current --namespace="${namespace}"
+}
+
+choose-ns() {
+    kubectl get ns --no-headers -o name | fzf | cut -d"/" -f 2
+}
 
 secret-read() {
     kubectl get secret "$1" -o json | jq -r '.data | with_entries(.value |= @base64d)';
