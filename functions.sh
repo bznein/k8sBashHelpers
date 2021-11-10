@@ -15,6 +15,9 @@ ke() {
     container=$(choose_container "$pod" )
     echo '\033[0;32m'
     kubectl exec -it "$pod" -c "$container" -- bash
+    if [ $? -ne 0 ]; then
+        kubectl exec -it "$pod" -c "$container" -- sh
+    fi
     echo '\033[0m'
 }
 
@@ -235,7 +238,7 @@ kdump() {
         then
             output+=$(kubectl get secrets -o name | xargs -n1 -I name kubectl get name -o json | jq -r '.data | with_entries(.value |= @base64d)')
         else
-            output+=$(kubectl get "$choice"  -o yaml)
+            output+=$(kubectl get "$choice"  -o json)
         fi
     done
     echo "$output"
